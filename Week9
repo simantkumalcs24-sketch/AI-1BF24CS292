@@ -1,0 +1,161 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyOdmer3JP14pFZ1gZAS9Zw1",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/simantkumalcs24-sketch/AI-1BF24CS292/blob/main/Week9\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "mzxYPLID_Y4x",
+        "outputId": "e83232f4-1925-47f4-b76a-a481c773e894"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Resolution Method:\n",
+            "New Clause: {'Likes(John,Peanuts)', 'Killed(Anil)', '~Eats(Anil,Peanuts)'}\n",
+            "New Clause: {'~Food(Peanuts)'}\n",
+            "New Clause: {'Killed(Anil)', 'Food(Peanuts)'}\n",
+            "New Clause: {'~Alive(Anil)', '~Eats(Anil,Peanuts)', 'Food(Peanuts)'}\n",
+            "New Clause: {'Eats(Harry,Peanuts)'}\n",
+            "New Clause: {'~Killed(Anil)'}\n",
+            "New Clause: {'Likes(John,Peanuts)', 'Killed(Anil)'}\n",
+            "New Clause: {'Likes(John,Peanuts)', '~Alive(Anil)', '~Eats(Anil,Peanuts)'}\n",
+            "New Clause: {'Killed(Anil)', '~Eats(Anil,Peanuts)'}\n",
+            "New Clause: {'~Eats(Anil,Peanuts)', 'Food(Peanuts)'}\n",
+            "New Clause: {'~Alive(Anil)', 'Food(Peanuts)'}\n",
+            "New Clause: {'Likes(John,Peanuts)', '~Eats(Anil,Peanuts)'}\n",
+            "New Clause: {'Killed(Anil)'}\n",
+            "New Clause: {'~Alive(Anil)', '~Eats(Anil,Peanuts)'}\n",
+            "New Clause: {'Food(Peanuts)'}\n",
+            "New Clause: {'Likes(John,Peanuts)', '~Alive(Anil)'}\n",
+            "New Clause: {'Likes(John,Peanuts)'}\n",
+            "New Clause: {'~Alive(Anil)'}\n",
+            "New Clause: {'~Eats(Anil,Peanuts)'}\n",
+            "\n",
+            "Empty Clause (NIL) Found!\n",
+            "Query Proved!\n"
+          ]
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "True"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 1
+        }
+      ],
+      "source": [
+        "\n",
+        "\n",
+        "\n",
+        "\n",
+        "KB = [\n",
+        "    {\"~Food(Peanuts)\", \"Likes(John,Peanuts)\"},\n",
+        "\n",
+        "    {\"Food(Apple)\"},\n",
+        "    {\"Food(Vegetables)\"},\n",
+        "\n",
+        "    {\"~Eats(Anil,Peanuts)\", \"Killed(Anil)\",\n",
+        "     \"Food(Peanuts)\"},\n",
+        "\n",
+        "    {\"Eats(Anil,Peanuts)\"},\n",
+        "    {\"Alive(Anil)\"},\n",
+        "\n",
+        "    {\"~Eats(Anil,Peanuts)\", \"Eats(Harry,Peanuts)\"},\n",
+        "\n",
+        "    {\"~Alive(Anil)\", \"~Killed(Anil)\"},\n",
+        "\n",
+        "    {\"Killed(Anil)\", \"Alive(Anil)\"},\n",
+        "\n",
+        "    {\"~Likes(John,Peanuts)\"}\n",
+        "]\n",
+        "\n",
+        "def negate(literal):\n",
+        "    if literal.startswith(\"~\"):\n",
+        "        return literal[1:]\n",
+        "    return \"~\" + literal\n",
+        "\n",
+        "def resolve(c1, c2):\n",
+        "    resolvents = []\n",
+        "\n",
+        "    for literal in c1:\n",
+        "        opposite = negate(literal)\n",
+        "\n",
+        "        if opposite in c2:\n",
+        "            new_clause = (c1 - {literal}) | (c2 - {opposite})\n",
+        "\n",
+        "            if not any(negate(x) in new_clause\n",
+        "                       for x in new_clause):\n",
+        "                resolvents.append(new_clause)\n",
+        "\n",
+        "    return resolvents\n",
+        "\n",
+        "def resolution(KB):\n",
+        "\n",
+        "    clauses = list(KB)\n",
+        "\n",
+        "    while True:\n",
+        "        new = []\n",
+        "\n",
+        "        for i in range(len(clauses)):\n",
+        "            for j in range(i + 1, len(clauses)):\n",
+        "\n",
+        "                resolvents = resolve(clauses[i], clauses[j])\n",
+        "\n",
+        "                for clause in resolvents:\n",
+        "\n",
+        "                    if len(clause) == 0:\n",
+        "                        print(\"\\nEmpty Clause (NIL) Found!\")\n",
+        "                        print(\"Query Proved!\")\n",
+        "                        return True\n",
+        "\n",
+        "                    if clause not in clauses and clause not in new:\n",
+        "                        new.append(clause)\n",
+        "                        print(\"New Clause:\", clause)\n",
+        "\n",
+        "        if not new:\n",
+        "            print(\"\\nQuery Cannot Be Proved\")\n",
+        "            return False\n",
+        "\n",
+        "        clauses.extend(new)\n",
+        "\n",
+        "\n",
+        "print(\"Resolution Method:\")\n",
+        "resolution(KB)\n"
+      ]
+    }
+  ]
+}
